@@ -1,16 +1,12 @@
 {
-    "manifest_version": 3,
-    "name": "Sidebar Extension",
-    "version": "1.0",
-    "description": "Add a sidebar to all web pages",
-    "permissions": ["activeTab"],
-    "host_permissions": ["<all_urls>"],
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["scripts/content.js"],
-        "run_at": "document_end"
-      }
-    ]
+  "manifest_version": 3,
+  "name": "Bookmark Side Panel",
+  "version": "1.0",
+  "permissions": ["bookmarks", "sidePanel", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Toggle Side Panel"
+  }
 }
-  
