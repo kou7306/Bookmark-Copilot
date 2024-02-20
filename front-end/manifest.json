@@ -1,15 +1,17 @@
 {
+  "name": "bookmarks side panel",
+  "version": "0.1",
   "manifest_version": 3,
-  "name": "Bookmark Side Panel",
-  "version": "1.0",
-  "permissions": ["bookmarks", "sidePanel", "storage"],
+  "description": "Provides definitions in the side panel.",
   "background": {
-    "service_worker": "background.js"
-  },
-  "action": {
-    "default_title": "Toggle Side Panel"
+    "service_worker": "service-worker.js"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel", "contextMenus","bookmarks"],
+  "action": {
+    "default_title": "Open Side Panel"
   }
+  
 }
