@@ -16,8 +16,13 @@ function dumpTreeNodes(bookmarkNodes) {
 
 function dumpNode(bookmarkNode) {
   const anchor = document.createElement('a');
-  anchor.setAttribute('href', bookmarkNode.url);
   anchor.textContent = bookmarkNode.title;
+
+  // クリックイベントを追加
+  anchor.addEventListener('click', function (event) {
+    event.preventDefault();  // デフォルトのリンクの挙動を防止
+    chrome.tabs.create({ url: bookmarkNode.url });  // 新しいタブでリンクを開く
+  });
 
   const li = document.createElement('li');
   li.appendChild(anchor);
@@ -28,6 +33,7 @@ function dumpNode(bookmarkNode) {
 
   return li;
 }
+
 
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
 document.addEventListener('DOMContentLoaded', function () {
