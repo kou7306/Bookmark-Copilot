@@ -1,0 +1,26 @@
+/* リスト全体のスタイル */
+ul {
+    list-style-type: none; /* リストマーカーを非表示 */
+    padding: 0; /* パディングをリセット */
+    margin: 0; /* マージンをリセット */
+  }
+  
+  /* 各リストアイテムのスタイル */
+  li {
+    margin-bottom: 10px; /* アイテム間のマージン */
+  }
+  
+  /* リンクのスタイル */
+  a {
+    display: block; /* ブロック要素として表示 */
+    padding: 5px 10px; /* パディングを追加 */
+    background-color: #f0f0f0; /* 背景色 */
+    color: #333; /* 文字色 */
+    text-decoration: none; /* 下線を非表示 */
+    border-radius: 5px; /* 角を丸める */
+  }
+  
+  /* リンクにホバーしたときのスタイル */
+  a:hover {
+    background-color: #e0e0e0; /* 背景色を変更 */
+  }  
