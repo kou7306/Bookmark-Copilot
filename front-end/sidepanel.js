@@ -2,11 +2,15 @@
 function dumpBookmarks() {
   chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
     document.getElementById('bookmarks').appendChild(dumpTreeNodes(bookmarkTreeNodes));
+    console.log(bookmarkTreeNodes);
   });
 }
 
 function dumpTreeNodes(bookmarkNodes) {
   const list = document.createElement('ul');
+  list.className = 'bookmark-list'; // クラス名を追加
+  console.log(bookmarkNodes);
+  
   for (let i = 0; i < bookmarkNodes.length; i++) {
     list.appendChild(dumpNode(bookmarkNodes[i]));
   }
@@ -16,6 +20,7 @@ function dumpTreeNodes(bookmarkNodes) {
 
 function dumpNode(bookmarkNode) {
   const anchor = document.createElement('a');
+  anchor.className = 'bookmark-link'; // クラス名を追加
   anchor.textContent = bookmarkNode.title;
 
   // クリックイベントを追加
@@ -25,6 +30,7 @@ function dumpNode(bookmarkNode) {
   });
 
   const li = document.createElement('li');
+  li.className = 'bookmark-item'; // クラス名を追加
   li.appendChild(anchor);
 
   if (bookmarkNode.children && bookmarkNode.children.length > 0) {
@@ -33,6 +39,7 @@ function dumpNode(bookmarkNode) {
 
   return li;
 }
+
 
 
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
