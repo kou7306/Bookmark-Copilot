@@ -38,23 +38,36 @@ chrome.action.onClicked.addListener((tab) => {
 //  ブックマークイベントを受け取る
 chrome.bookmarks.onCreated.addListener(function(id, bookmarkNode) {
   console.log('New bookmark added:', bookmarkNode.url);
-  url=bookmarkNode.url;
-  getRootBookmarkFolders() // ルートにあるブックマークのフォルダ情報を取得
-  .then(folders => {
-    console.log('Sending folders to API:', folders);
-    return sendRequestToApi(folders);
-  })
-  .then(response => {
-    console.log('API response:', response.folder);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  }); 
+  const url = bookmarkNode.url;
 
+  getRootBookmarkFolders()  // ルートにあるブックマークのフォルダ情報を取得
+    .then(folders => {
+      console.log('Sending folders to API:', folders);
+      return sendRequestToApi(url, folders).then(response => {
+        return { response, folders };  // APIレスポンスとフォルダリストを次のステップに渡す
+      });
+    })
+    .then(({ response, folders }) => {
+      console.log('API response:', response);
+      const recommendedFolderName = findMatchingFolderName(response.folder, folders);  // レスポンスからフォルダ名を探す
+      return findFolderId(recommendedFolderName);  // フォルダ名に対応するフォルダIDを探す
+    })
+    .then(folderId => {
+      console.log('Found matching folder ID:', folderId);
+      if (folderId) {
+        
+        // フォルダIDが見つかった場合、ブックマークをそのフォルダに移動
+        chrome.bookmarks.move(bookmarkNode.id, { parentId: folderId }); 
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 });
 
+
 // APIにリクエストを送信する関数
-function sendRequestToApi(folderData) {
+function sendRequestToApi(url,folderData) {
   const apiUrl = 'https://asia-northeast1-bookmarkai-414803.cloudfunctions.net/get_url_info';
   const requestBody = {
     url: url,
@@ -74,8 +87,39 @@ function sendRequestToApi(folderData) {
 function getRootBookmarkFolders() {
   return new Promise((resolve, reject) => {
     chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-      const rootFolders = bookmarkTreeNodes[0].children.filter(node => !node.url).map(folder => folder.title);
-      resolve(rootFolders);
+      const Folders = bookmarkTreeNodes[0].children
+    .filter(node => !node.url)  // ルートレベルのフォルダを抽出
+    .flatMap(folder => folder.children.filter(subNode => !subNode.url))  // 各フォルダの子ノードからさらにフォルダを抽出
+    .map(subFolder => subFolder.title);  // フォルダ名を抽出
+      resolve(Folders);
     });
   });
+}
+
+
+// フォルダ名に対応するフォルダIDを探す関数
+function findFolderId(folderName) {
+  return new Promise((resolve, reject) => {
+    chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+      // ルートフォルダの一つ下の階層のフォルダを取得
+      const subFolders = bookmarkTreeNodes[0].children
+        .filter(node => !node.url)
+        .flatMap(folder => folder.children.filter(subNode => !subNode.url));
+
+      // さらに一つ下の階層のフォルダから、指定されたフォルダ名に一致するフォルダを探す
+      const matchingFolder = subFolders.find(folder => folder.title === folderName);
+      resolve(matchingFolder ? matchingFolder.id : null);
+    });
+  });
+}
+
+
+// レスポンス文字列に含まれるフォルダ名を探す関数
+function findMatchingFolderName(responseText, folderNames) {
+  for (const folderName of folderNames) {
+    if (responseText.includes(folderName)) {
+      return folderName;
+    }
+  }
+  return null;
 }
