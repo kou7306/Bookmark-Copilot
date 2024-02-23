@@ -60,4 +60,58 @@ function dumpNode(bookmarkNode) {
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
 document.addEventListener('DOMContentLoaded', function () {
   dumpBookmarks();
+
+  // searchInput 要素を取得
+  var searchInput = document.getElementById('searchInput');
+
+  // searchInput が存在する場合のみ、イベントリスナーを追加
+  if (searchInput !== null) {
+    // 検索入力フィールドの変更イベントを監視して検索を実行
+    searchInput.addEventListener('input', function() {
+      searchBookmarks();
+    });
+  }
 });
+
+
+
+
+// 検索結果の表示をリスト形式に変更する関数
+function displaySearchResults(results, searchTerm) {
+  var bookmarksList = document.getElementById('bookmarksList');
+  bookmarksList.innerHTML = ''; // 検索前にリストをクリア
+
+  // 検索結果の処理
+  results.forEach(function(bookmark) {
+    // ブックマークの名前に検索語が含まれる場合のみリストに追加
+    if (bookmark.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+      var listItem = document.createElement('li');
+      var link = document.createElement('a');
+      link.textContent = bookmark.title;
+      link.href = bookmark.url;
+      link.target = '_blank'; // リンクを新しいタブで開く
+      listItem.appendChild(link);
+      bookmarksList.appendChild(listItem);
+    }
+  });
+
+  // 検索結果がない場合はメッセージを表示
+  if (bookmarksList.childElementCount === 0) {
+    var message = document.createElement('p');
+    message.textContent = '検索結果がありません';
+    bookmarksList.appendChild(message);
+  }
+}
+
+// ブックマークを名前から検索する関数
+function searchBookmarks() {
+  var searchInput = document.getElementById('searchInput');
+  var searchTerm = searchInput.value.trim();
+
+  // 検索語が空でない場合のみ検索を実行
+  if (searchTerm !== '') {
+    chrome.bookmarks.search(searchTerm, function(results) {
+      displaySearchResults(results, searchTerm); // searchTermを渡す
+    });
+  }
+}
