@@ -2,7 +2,8 @@
 ul {
     list-style-type: none; /* リストマーカーを非表示 */
     padding: 0; /* パディングをリセット */
-    margin: 0; /* マージンをリセット */
+    margin-top: 10px;
+    margin-bottom: 10px
   }
   
   /* 各リストアイテムのスタイル */
