@@ -5,7 +5,9 @@ function dumpBookmarks() {
     for (let i = 0; i < bookmarkTreeNodes.length; i++) {
       const children = bookmarkTreeNodes[i].children;
       if (children && children.length > 0) {
-        document.getElementById('bookmarks').appendChild(dumpTreeNodes(children));
+        for (let j = 0; j < children.length; j++) {
+          document.getElementById('bookmarks').appendChild(dumpTreeNodes(children[j].children));
+        }
       }
     }
   });
