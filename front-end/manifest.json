@@ -2,6 +2,7 @@
   "name": "bookmarks side panel",
   "version": "0.1",
   "manifest_version": 3,
+
   "description": "Provides definitions in the side panel.",
   "background": {
     "service_worker": "service-worker.js"
@@ -10,8 +11,12 @@
     "default_path": "sidepanel.html"
   },
   "permissions": ["sidePanel", "contextMenus","bookmarks"],
+  
   "action": {
+    "default_popup": "sidepanel.html",
     "default_title": "Open Side Panel"
   }
   
 }
+
+

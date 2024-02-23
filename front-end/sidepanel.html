@@ -1,11 +1,25 @@
 <html>
-  <head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <link rel="stylesheet" type="text/css" href="sidepanel.css">
-    <title>Dictionary Side Panel</title>
-  </head>
-  <body>
+    <title>Bookmarks Side Panel</title>
+</head>
+<body>
+    <h1>Bookmarks Side Panel</h1>
+    <button id="openPopupButton">Open Bookmark Manager</button>
+    <input type="text" id="searchInput" placeholder="Search bookmarks">
+    <button id="searchButton">Search</button>
+    <ul id="bookmarksList">
+      <!-- ここに検索結果が追加されます -->
+    </ul>
+
     <div id="bookmarks"></div>
 
+    <!-- ブックマーク削除ボタン -->
+    <button id="deleteSelectedButton">Delete Selected</button>
+
     <script src="sidepanel.js"></script>
-  </body>
+</body>
 </html>
