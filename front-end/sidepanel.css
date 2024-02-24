@@ -64,3 +64,9 @@ a:hover {
   width: minmax(40px, 1fr); /* 幅を16pxに設定 */
   height: minmax(40px, 1fr); /* 高さを16pxに設定 */
 }
+
+.reload-icon {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
