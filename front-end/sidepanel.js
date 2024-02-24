@@ -41,6 +41,15 @@ function dumpNode(bookmarkNode) {
   img.src = faviconURL(bookmarkNode.url);
   img.className = 'favicon'; // クラス名を追加
 
+  // ファビコンのクリックイベントを追加
+  img.addEventListener('click', function (event) {
+    event.preventDefault();  // デフォルトのリンクの挙動を防止
+    if (bookmarkNode.url) {
+      // URLがある場合は新しいタブでリンクを開く
+      chrome.tabs.create({ url: bookmarkNode.url });
+    }
+  });
+
   // クリックイベントを追加
   anchor.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
