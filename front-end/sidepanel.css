@@ -33,6 +33,6 @@ a:hover {
 
 /* ファビコンのスタイル */
 .favicon {
-  width: 128px; /* 幅を16pxに設定 */
-  height: 128px; /* 高さを16pxに設定 */
+  width: minmax(100px, 1fr); /* 幅を16pxに設定 */
+  height: minmax(100px, 1fr); /* 高さを16pxに設定 */
 }
