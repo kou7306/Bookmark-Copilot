@@ -15,6 +15,8 @@ icon.className = 'reload-icon';
 // アイコンをbodyに追加します
 document.body.appendChild(icon);
 
+icon.style.display = 'none';
+
 // ファビコンURLを生成する関数
 function faviconURL(u) {
   try {
@@ -137,15 +139,24 @@ function dumpNode(bookmarkNode) {
 
   // ファビコンのクリックイベントを追加
   img.addEventListener('click', function (event) {
-    // 省略...
-  
-    // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
-    if (childList.style.display !== 'none') {
-      parentNodes.push(bookmarkNode); // 開いたフォルダの親フォルダを記録
-      const sidebar = document.getElementById('bookmarks');
-      sidebar.innerHTML = ''; // サイドバーをクリア
-      sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
-      showBackButton(); // 「戻る」ボタンの表示を更新
+    event.preventDefault();  // デフォルトのリンクの挙動を防止
+    if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+      // 子ノードがある場合はそれを表示
+      const childList = this.nextSibling.nextSibling;
+      childList.style.display = childList.style.display === 'none' ? '' : 'none';
+      // フォルダの開閉状態に応じてアイコンを切り替え
+      this.src = childList.style.display === 'none' ? 'icons/folder_96.png' : 'icons/folder_opened_96.png';
+
+      // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+      if (childList.style.display !== 'none') {
+        icon.style.display = 'block';
+        const sidebar = document.getElementById('bookmarks');
+        sidebar.innerHTML = ''; // サイドバーをクリア
+        sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+      }
+    } else if (bookmarkNode.url) {
+      // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
+      chrome.tabs.create({ url: bookmarkNode.url });
     }
   });
 
@@ -206,6 +217,10 @@ document.addEventListener('DOMContentLoaded', function () {
 // searchInput 要素を取得
 var searchInput = document.getElementById('searchInput');
 
+if (searchInput == null) {
+  window.location.reload();
+}
+
 // searchInput が存在する場合のみ、イベントリスナーを追加
 if (searchInput !== null) {
   // 検索入力フィールドの変更イベントを監視して検索を実行
@@ -240,6 +255,7 @@ function displaySearchResults(results, searchTerm) {
 function searchBookmarks() {
   var searchInput = document.getElementById('searchInput');
   var searchTerm = searchInput.value.trim();
+  
 
   // 検索語が空でない場合に検索を実行
   if (searchTerm) {
@@ -247,12 +263,7 @@ function searchBookmarks() {
       displaySearchResults(results, searchTerm);
     });
   } else {
-    // 検索語が空の場合は全てのブックマークを表示
-    chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-      var allBookmarks = [];
-      extractBookmarks(bookmarkTreeNodes, allBookmarks);
-      displaySearchResults(allBookmarks, searchTerm);
-    });
+    window.location.reload();
   }
 }
 
