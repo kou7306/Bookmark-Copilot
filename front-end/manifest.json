@@ -9,6 +9,9 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+  "host_permissions": [
+    "https://asia-northeast1-bookmarkai-414803.cloudfunctions.net/*"
+  ],
   "permissions": ["sidePanel", "contextMenus","bookmarks"],
   "action": {
     "default_title": "Open Side Panel"
