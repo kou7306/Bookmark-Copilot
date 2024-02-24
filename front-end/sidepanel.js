@@ -43,31 +43,25 @@ function dumpNode(bookmarkNode) {
 
   // ファビコンを表示するためのimg要素を作成
   const img = document.createElement('img');
-  img.src = faviconURL(bookmarkNode.url);
   img.className = 'favicon'; // クラス名を追加
+
+  if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+    // フォルダの場合はデフォルトで閉じているアイコンを表示
+    img.src = 'icons/folder_96.png';
+  } else if (bookmarkNode.url) {
+    // ブックマークの場合はファビコンを表示
+    img.src = faviconURL(bookmarkNode.url);
+  }
 
   // ファビコンのクリックイベントを追加
   img.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
     if (bookmarkNode.children && bookmarkNode.children.length > 0) {
       // 子ノードがある場合はそれを表示
-      this.nextSibling.nextSibling.style.display = this.nextSibling.nextSibling.style.display === 'none' ? '' : 'none';
-    } else if (bookmarkNode.url) {
-      // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
-      chrome.tabs.create({ url: bookmarkNode.url });
-    }
-  });
-
-  // クリックイベントを追加
-  anchor.addEventListener('click', function (event) {
-    console.log('click event');
-    event.preventDefault();  // デフォルトのリンクの挙動を防止
-    if (bookmarkNode.children && bookmarkNode.children.length > 0) {
-      // 子ノードがある場合はそれを表示
-      const ul = this.parentElement.querySelector('ul'); // クリックされたアンカーの親要素の <ul> を取得
-      if (ul) {
-        ul.style.display = ul.style.display === 'none' ? '' : 'none'; // 表示状態を切り替える
-      }
+      const childList = this.nextSibling.nextSibling;
+      childList.style.display = childList.style.display === 'none' ? '' : 'none';
+      // フォルダの開閉状態に応じてアイコンを切り替え
+      this.src = childList.style.display === 'none' ? 'icons/folder_96.png' : 'icons/folder_opened_96.png';
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
