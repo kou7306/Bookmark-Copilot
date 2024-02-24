@@ -191,9 +191,6 @@ function dumpNode(bookmarkNode) {
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
 document.addEventListener('DOMContentLoaded', function () {
   dumpBookmarks();
-
-
-
   });
 
 
@@ -347,13 +344,14 @@ function createMoveButton(bookmarkId,dialog) {
 }
 
 async function selectFolder(bookmarkId) {
+  
   return new Promise((resolve) => {
     const folders = []; // ブックマークツリーから取得したフォルダの配列
 
     // ブックマークツリーを取得してフォルダを抽出
     chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
       const root = bookmarkTreeNodes[0]; // ルートノードを取得
-      getAllFolders(root, folders); // 全てのフォルダを取得
+      getAllFolders(root, folders,bookmarkId); // 全てのフォルダを取得
        
       // カスタムダイアログを作成
       const dialog = document.createElement('div');
@@ -391,28 +389,79 @@ async function selectFolder(bookmarkId) {
 
 
 
+// ブックマークを移動する関数
+async function moveBookmark(bookmarkId, newParentId) {
+  const bookmarkNode = await new Promise((resolve, reject) => {
+      chrome.bookmarks.get(bookmarkId, (result) => {
+          if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+          } else {
+              resolve(result[0]);
+          }
+      });
+  });
 
+  if (bookmarkNode.url === undefined) {
+     // サブツリーを取得
+     const subTree = await new Promise((resolve, reject) => {
+      chrome.bookmarks.getSubTree(bookmarkId, (result) => {
+          if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+          } else {
+              resolve(result[0]);
+          }
+      });
+  });
 
+  // ブックマークを新しい親フォルダに移動
+  await new Promise((resolve, reject) => {
+      chrome.bookmarks.move(bookmarkId, { parentId: newParentId }, (result) => {
+          if (chrome.runtime.lastError) {
+              alert('フォルダを移動できません。フォルダを別の場所に移動してください。');
+              reject(chrome.runtime.lastError);
+          } else {
+              resolve(result);
+          }
+      });
+  });
 
-async function moveBookmark(bookmarkId, folderId) {
-  chrome.bookmarks.move(bookmarkId, { parentId: folderId });
+  // サブツリー内の各子要素を移動
+  for (const child of subTree.children) {
+      // 新しい親フォルダのIDが子要素のIDと異なる場合にのみ移動する
+      if (child.id !== newParentId) {
+          await moveBookmark(child.id, bookmarkId);
+      }
+  }
+  } else {
+      await new Promise((resolve, reject) => {
+          chrome.bookmarks.move(bookmarkId, { parentId: newParentId }, (result) => {
+              if (chrome.runtime.lastError) {
+                  reject(chrome.runtime.lastError);
+              } else {
+                  resolve(result);
+              }
+          });
+      });
+  }
 }
 
 
 // ブックマークツリー全体を取得してフォルダを再帰的に抽出
-function getAllFolders(node, folders) {
+function getAllFolders(node, folders, excludedId) {
   if (!node.children) return;
 
   node.children.forEach(child => {
     if (child.url) return; // URL の場合はスキップ
+    if (child.id === excludedId) return; // 指定された ID の場合はスキップ
     folders.push(child); // フォルダを追加
 
     // 子ノードがある場合は再帰的に呼び出す
     if (child.children) {
-      getAllFolders(child, folders);
+      getAllFolders(child, folders, excludedId);
     }
   });
 }
+
 
 chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
   const folders = [];
