@@ -37,10 +37,17 @@ chrome.action.onClicked.addListener((tab) => {
 
 //  ブックマークイベントを受け取る
 chrome.bookmarks.onCreated.addListener(function(id, bookmarkNode) {
+  // bookmarkNodeがフォルダである場合は処理をスキップする
+  if (bookmarkNode.url === undefined) {
+      chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+      return;
+  }
+  
   console.log('New bookmark added:', bookmarkNode.url);
   selectFolder(bookmarkNode);
   chrome.runtime.sendMessage({ action: 'updateBookmarks' });
 });
+
 
 // ブックマークのフォルダを変更する関数
 function selectFolder(bookmarkNode) {
