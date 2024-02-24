@@ -72,11 +72,7 @@ function dumpNode(bookmarkNode) {
     // 生成した <a> 要素を DOM に追加
     li.appendChild(button);
     
-    // const removeButton = createRemoveButton(bookmarkNode.id);
-    // li.appendChild(removeButton);
 
-    // const moveButton = createMoveButton(bookmarkNode.id);
-    // li.appendChild(moveButton);
   }
 
 
@@ -196,6 +192,7 @@ function sortBookmarksToFolder() {
 function createRemoveButton(bookmarkId) {
   const button = document.createElement('button');
   button.textContent = '削除';
+  button.style.width = '50px';
   button.addEventListener('click', () => {
     removeBookmark(bookmarkId);
   });
@@ -204,16 +201,23 @@ function createRemoveButton(bookmarkId) {
 
 // ブックマークを削除する関数
 function removeBookmark(bookmarkId) {
-  chrome.bookmarks.remove(bookmarkId, () => {
-    console.log('Bookmark removed:', bookmarkId);
-    chrome.runtime.sendMessage({ action: 'updateBookmarks' });
-  });
+  // 確認用のダイアログを表示し、"OK" が選択された場合のみブックマークを削除する
+  if (confirm('ほんとに削除してもよろしいですか?')) {
+    chrome.bookmarks.remove(bookmarkId, () => {
+      console.log('Bookmark removed:', bookmarkId);
+      chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+
+    });
+  }
 }
 
-function createMoveButton(bookmarkId) {
+
+function createMoveButton(bookmarkId,dialog) {
   const button = document.createElement('button');
   button.textContent = '移動';
+  button.style.width = '50px';
   button.addEventListener('click', async () => {
+    dialog.remove(); // ダイアログを閉じる
     
     const folderId = await selectFolder(bookmarkId); // フォルダを選択
     if (folderId) {
@@ -255,9 +259,10 @@ async function selectFolder(bookmarkId) {
         });
         list.appendChild(listItem);
       });
-   
+      const backButton = createBackButton(dialog,false,bookmarkId,null);
       // ダイアログにリストを追加
       dialog.appendChild(list);
+      dialog.appendChild(backButton);
    
       // ボディにダイアログを追加
       document.body.appendChild(dialog);
@@ -297,6 +302,19 @@ chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
 });
 
 function showActionsDialog(bookmarkId) {
+  // オーバーレイが存在しない場合のみ作成
+  if (!document.getElementById('overlay')) {
+    const overlay = document.createElement('div');
+    overlay.id = 'overlay'; // ID を設定して後から取得できるようにする
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // 半透明の黒
+    overlay.style.zIndex = '9998'; // ダイアログよりも背面に配置
+    document.body.appendChild(overlay);
+  }
   const dialog = document.createElement('div');
   dialog.style.position = 'fixed';
   dialog.style.top = '50%';
@@ -308,29 +326,44 @@ function showActionsDialog(bookmarkId) {
   dialog.style.zIndex = '9999';
 
   const deleteButton = createRemoveButton(bookmarkId);
-  const moveButton = createMoveButton(bookmarkId);
-  const backButton = createBackButton(dialog);
+  const moveButton = createMoveButton(bookmarkId,dialog);
+  const backButton = createBackButton(dialog,true,bookmarkId,overlay);
 
   dialog.appendChild(deleteButton);
   dialog.appendChild(moveButton);
   dialog.appendChild(backButton);
 
   document.body.appendChild(dialog);
+
 }
 
-function createBackButton(dialog) {
+function createBackButton(dialog,flag,bookmarkId,overlay) {
   const backButton = document.createElement('button');
   backButton.textContent = '';
   backButton.style.position = 'absolute';
   backButton.style.top = '2px'; // 上端からの距離
   backButton.style.left = '2px'; // 左端からの距離
-  backButton.style.backgroundImage = 'url(./images/close.png)';
+  if(flag){
+    backButton.style.backgroundImage = 'url(./images/close.png)';
+  }
+  else{
+    backButton.style.backgroundImage = 'url(./images/back.png)';
+  }
   backButton.style.backgroundSize = 'cover';
   backButton.style.width = '20px'; // ボタンの幅
   backButton.style.height = '20px'; // ボタンの高さ
   backButton.style.border = 'none'; // ボーダーをなくす
   backButton.addEventListener('click', () => {
-    document.body.removeChild(dialog); // ダイアログを閉じる
+    if (flag){
+      dialog.remove();
+      overlay.remove();
+    }
+    else{
+      dialog.remove(); // ダイアログを閉じる
+      
+      showActionsDialog(bookmarkId);
+    }
+    
   });
   return backButton;
 }
