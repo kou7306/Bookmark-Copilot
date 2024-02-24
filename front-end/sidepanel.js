@@ -1,3 +1,29 @@
+let parentNodes = []; // 開いたフォルダの親フォルダを記録するスタック
+
+// フォルダを開くたびに「戻る」ボタンを表示
+function showBackButton() {
+  const backButton = document.getElementById('back-button');
+  if (parentNodes.length > 0) {
+    // フォルダを開いたときだけ「戻る」ボタンを表示
+    backButton.style.display = '';
+  } else {
+    // ルートノードにいるときは「戻る」ボタンを非表示
+    backButton.style.display = 'none';
+  }
+}
+
+// 「戻る」ボタンがクリックされたときの処理
+document.getElementById('back-button').addEventListener('click', function () {
+  if (parentNodes.length > 0) {
+    const parentNode = parentNodes.pop(); // 最後に開いたフォルダの親フォルダを取得
+    const sidebar = document.getElementById('bookmarks');
+    sidebar.innerHTML = ''; // サイドバーをクリア
+    sidebar.appendChild(dumpTreeNodes(parentNode.children)); // 親フォルダを開く
+    showBackButton(); // 「戻る」ボタンの表示を更新
+  }
+});
+
+
 // ファビコンURLを生成する関数
 function faviconURL(u) {
   try {
@@ -65,23 +91,15 @@ function dumpNode(bookmarkNode) {
 
   // ファビコンのクリックイベントを追加
   img.addEventListener('click', function (event) {
-    event.preventDefault();  // デフォルトのリンクの挙動を防止
-    if (bookmarkNode.children && bookmarkNode.children.length > 0) {
-      // 子ノードがある場合はそれを表示
-      const childList = this.nextSibling.nextSibling;
-      childList.style.display = childList.style.display === 'none' ? '' : 'none';
-      // フォルダの開閉状態に応じてアイコンを切り替え
-      this.src = childList.style.display === 'none' ? 'icons/folder_96.png' : 'icons/folder_opened_96.png';
-
-      // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
-      if (childList.style.display !== 'none') {
-        const sidebar = document.getElementById('bookmarks');
-        sidebar.innerHTML = ''; // サイドバーをクリア
-        sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
-      }
-    } else if (bookmarkNode.url) {
-      // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
-      chrome.tabs.create({ url: bookmarkNode.url });
+    // 省略...
+  
+    // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+    if (childList.style.display !== 'none') {
+      parentNodes.push(bookmarkNode); // 開いたフォルダの親フォルダを記録
+      const sidebar = document.getElementById('bookmarks');
+      sidebar.innerHTML = ''; // サイドバーをクリア
+      sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+      showBackButton(); // 「戻る」ボタンの表示を更新
     }
   });
 
@@ -135,10 +153,7 @@ function dumpNode(bookmarkNode) {
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
 document.addEventListener('DOMContentLoaded', function () {
   dumpBookmarks();
-
-
-
-  });
+});
 
 
 // 検索に関する処理
