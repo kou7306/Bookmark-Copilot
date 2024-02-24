@@ -114,6 +114,7 @@ function searchBookmarks() {
 }
 // メッセージリスナーを追加してブックマークの更新を監視
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('message received:', message);
   if (message.action === 'updateBookmarks') {
     console.log('bookmarks updated!');
     window.location.reload();
