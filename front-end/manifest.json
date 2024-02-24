@@ -9,7 +9,7 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
-  "permissions": ["sidePanel", "contextMenus","bookmarks"],
+  "permissions": ["sidePanel", "contextMenus","bookmarks","favicon"],
   "action": {
     "default_title": "Open Side Panel"
   }
