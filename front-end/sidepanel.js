@@ -194,25 +194,23 @@ function createMoveButton(bookmarkId) {
   button.textContent = '移動';
   button.addEventListener('click', async () => {
     
-    const folderId = await selectFolder(); // フォルダを選択
+    const folderId = await selectFolder(bookmarkId); // フォルダを選択
     if (folderId) {
       moveBookmark(bookmarkId, folderId); // ブックマークを移動
     }
   });
   return button;
 }
-async function selectFolder() {
+
+async function selectFolder(bookmarkId) {
   return new Promise((resolve) => {
     const folders = []; // ブックマークツリーから取得したフォルダの配列
 
     // ブックマークツリーを取得してフォルダを抽出
     chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-      const folders = bookmarkTreeNodes[0].children
-    .filter(node => !node.url)  // ルートレベルのフォルダを抽出
-    .flatMap(folder => folder.children.filter(subNode => !subNode.url))  // 各フォルダの子ノードからさらにフォルダを抽出
- 
-  
-
+      const root = bookmarkTreeNodes[0]; // ルートノードを取得
+      getAllFolders(root, folders); // 全てのフォルダを取得
+       
       // カスタムダイアログを作成
       const dialog = document.createElement('div');
       dialog.style.position = 'fixed';
@@ -223,7 +221,7 @@ async function selectFolder() {
       dialog.style.padding = '20px';
       dialog.style.border = '1px solid #ccc';
       dialog.style.zIndex = '9999';
-
+   
       // フォルダ名のリストを表示
       const list = document.createElement('ul');
       folders.forEach((folder, index) => {
@@ -236,10 +234,10 @@ async function selectFolder() {
         });
         list.appendChild(listItem);
       });
-
+   
       // ダイアログにリストを追加
       dialog.appendChild(list);
-
+   
       // ボディにダイアログを追加
       document.body.appendChild(dialog);
     });
@@ -254,3 +252,25 @@ async function selectFolder() {
 async function moveBookmark(bookmarkId, folderId) {
   chrome.bookmarks.move(bookmarkId, { parentId: folderId });
 }
+
+
+// ブックマークツリー全体を取得してフォルダを再帰的に抽出
+function getAllFolders(node, folders) {
+  if (!node.children) return;
+
+  node.children.forEach(child => {
+    if (child.url) return; // URL の場合はスキップ
+    folders.push(child); // フォルダを追加
+
+    // 子ノードがある場合は再帰的に呼び出す
+    if (child.children) {
+      getAllFolders(child, folders);
+    }
+  });
+}
+
+chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+  const folders = [];
+  getAllFolders(bookmarkTreeNodes[0], folders);
+  console.log(folders);
+});
