@@ -36,6 +36,16 @@ function dumpNode(bookmarkNode) {
   anchor.className = 'bookmark-link'; // クラス名を追加
   anchor.textContent = bookmarkNode.title;
 
+
+    // テキストの文字数制限
+    const maxLength = 12; // 最大の文字数
+    let text = bookmarkNode.title;
+    if (text.length > maxLength) {
+      text = text.substring(0, maxLength) + '...'; // 切り詰める
+    }
+    anchor.textContent = text;
+
+
   // ファビコンを表示するためのimg要素を作成
   const img = document.createElement('img');
   img.src = faviconURL(bookmarkNode.url);
