@@ -119,3 +119,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     window.location.reload();
   }
 });
+
+
+
+
+// ボタンクリックイベントリスナー
+document.getElementById('arrangeButton').addEventListener('click', () => {
+  sortBookmarksToFolder();
+});
+
+// フォルダに入っていないブックマークを特定のフォルダに振り分ける関数
+function sortBookmarksToFolder() {
+
+  // フォルダに入っていないブックマークの取得
+  chrome.bookmarks.getTree((nodes) => {
+    // ルートノードの直下にあるブックマークを探す
+    const bookmarks = nodes[0].children
+    .filter(node => !node.url)  // ルートレベルのフォルダを抽出
+    .flatMap(folder => folder.children.filter(subNode => subNode.url))  // 各フォルダの子ノードからフォルダ以外を抽出  
+    chrome.runtime.sendMessage({ bookmarks: bookmarks, action: 'sortBookmarks'});
+    });
+    
+  }
