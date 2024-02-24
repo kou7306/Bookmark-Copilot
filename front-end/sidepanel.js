@@ -46,12 +46,67 @@ function dumpBookmarks() {
 function dumpTreeNodes(bookmarkNodes) {
   const list = document.createElement('ul');
   list.className = 'bookmark-list'; // クラス名を追加
+  //　フォルダのみを最初に表示する
   for (let i = 0; i < bookmarkNodes.length; i++) {
+
+  // ノードがフォルダであるかどうかをチェック
+  if (bookmarkNodes[i].children) {
+    // フォルダの場合、処理を行う
     list.appendChild(dumpNode(bookmarkNodes[i]));
   }
 
+  }
+  // フォルダ以外のノードを表示する
+  for (let i = 0; i < bookmarkNodes.length; i++) {
+    if (!bookmarkNodes[i].children) {
+      list.appendChild(dumpNode(bookmarkNodes[i]));
+    }
+  }
+
+
+  //最終アクセス日時ソート系処理
+  // フォルダ以外のノードを表示する
+  // let bookmarks = [];
+
+  // // ブックマークを抽出
+  // for (let i = 0; i < bookmarkNodes.length; i++) {
+  //   if (!bookmarkNodes[i].children) {
+  //     bookmarks.push(bookmarkNodes[i]);
+  //   }
+  // }
+  
+  // // 履歴の最終アクセス日時を取得してブックマークをソート
+  // getBookmarkAccessTimes(bookmarks).then(sortedBookmarks => {
+  //   // ソートされたブックマークを処理
+  //   for (let bookmark of sortedBookmarks) {
+  //     // ここでブックマークを表示するなどの処理を行う
+  //     list.appendChild(dumpNode(bookmark));
+  //   }
+  // });
+
   return list;
 }
+
+
+// // ブックマークの履歴の最終アクセス日時を取得してソートする関数
+// function getBookmarkAccessTimes(bookmarks) {
+//   return Promise.all(bookmarks.map(bookmark => {
+//     return new Promise(resolve => {
+//       chrome.history.search({text: bookmark.url, maxResults: 1}, historyItems => {
+//         if (historyItems.length > 0) {
+//           bookmark.lastVisitTime = historyItems[0].lastVisitTime;
+//         } else {
+//           bookmark.lastVisitTime = 0; // 履歴がない場合は0とする
+//         }
+//         resolve(bookmark);
+//       });
+//     });
+//   })).then(bookmarks => {
+//     // 最終アクセス日時でソート
+//     return bookmarks.sort((a, b) => b.lastVisitTime - a.lastVisitTime);
+//   });
+// }
+
 
 function dumpNode(bookmarkNode) {
   const anchor = document.createElement('a');
@@ -72,7 +127,7 @@ function dumpNode(bookmarkNode) {
   const img = document.createElement('img');
   img.className = 'favicon'; // クラス名を追加
 
-  if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+  if (bookmarkNode.children) {
     // フォルダの場合はデフォルトで閉じているアイコンを表示
     img.src = 'icons/folder_96.png';
   } else if (bookmarkNode.url) {
