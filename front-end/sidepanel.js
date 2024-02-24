@@ -50,12 +50,33 @@ function dumpNode(bookmarkNode) {
   li.className = 'bookmark-item'; // クラス名を追加
   li.appendChild(anchor);
   if (bookmarkNode.url) {
-    // 削除ボタンを追加
-    const removeButton = createRemoveButton(bookmarkNode.id);
-    li.appendChild(removeButton);
+    // 編集ボタンを追加
 
-    const moveButton = createMoveButton(bookmarkNode.id);
-    li.appendChild(moveButton);
+    const button = document.createElement('button');
+    button.addEventListener('click', () => {
+      // ボタンがクリックされたときの処理
+      console.log('Button clicked!');
+      showActionsDialog(bookmarkNode.id);
+    });
+
+    // 画像を表示する img 要素を作成
+    const image = document.createElement('img');
+    image.src = './images/edit.png'; // 画像のパスを設定
+    image.alt = 'Image Alt Text'; // 画像の代替テキストを設定
+
+    // img 要素を button 要素に追加
+    button.appendChild(image);
+
+
+
+    // 生成した <a> 要素を DOM に追加
+    li.appendChild(button);
+    
+    // const removeButton = createRemoveButton(bookmarkNode.id);
+    // li.appendChild(removeButton);
+
+    // const moveButton = createMoveButton(bookmarkNode.id);
+    // li.appendChild(moveButton);
   }
 
 
@@ -274,3 +295,42 @@ chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
   getAllFolders(bookmarkTreeNodes[0], folders);
   console.log(folders);
 });
+
+function showActionsDialog(bookmarkId) {
+  const dialog = document.createElement('div');
+  dialog.style.position = 'fixed';
+  dialog.style.top = '50%';
+  dialog.style.left = '50%';
+  dialog.style.transform = 'translate(-50%, -50%)';
+  dialog.style.backgroundColor = '#fff';
+  dialog.style.padding = '20px';
+  dialog.style.border = '1px solid #ccc';
+  dialog.style.zIndex = '9999';
+
+  const deleteButton = createRemoveButton(bookmarkId);
+  const moveButton = createMoveButton(bookmarkId);
+  const backButton = createBackButton(dialog);
+
+  dialog.appendChild(deleteButton);
+  dialog.appendChild(moveButton);
+  dialog.appendChild(backButton);
+
+  document.body.appendChild(dialog);
+}
+
+function createBackButton(dialog) {
+  const backButton = document.createElement('button');
+  backButton.textContent = '';
+  backButton.style.position = 'absolute';
+  backButton.style.top = '2px'; // 上端からの距離
+  backButton.style.left = '2px'; // 左端からの距離
+  backButton.style.backgroundImage = 'url(./images/close.png)';
+  backButton.style.backgroundSize = 'cover';
+  backButton.style.width = '20px'; // ボタンの幅
+  backButton.style.height = '20px'; // ボタンの高さ
+  backButton.style.border = 'none'; // ボーダーをなくす
+  backButton.addEventListener('click', () => {
+    document.body.removeChild(dialog); // ダイアログを閉じる
+  });
+  return backButton;
+}
