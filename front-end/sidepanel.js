@@ -32,10 +32,14 @@ function dumpNode(bookmarkNode) {
 
   // クリックイベントを追加
   anchor.addEventListener('click', function (event) {
+    console.log('click event');
     event.preventDefault();  // デフォルトのリンクの挙動を防止
     if (bookmarkNode.children && bookmarkNode.children.length > 0) {
       // 子ノードがある場合はそれを表示
-      this.nextSibling.style.display = this.nextSibling.style.display === 'none' ? '' : 'none';
+      const ul = this.parentElement.querySelector('ul'); // クリックされたアンカーの親要素の <ul> を取得
+      if (ul) {
+        ul.style.display = ul.style.display === 'none' ? '' : 'none'; // 表示状態を切り替える
+      }
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
@@ -45,9 +49,12 @@ function dumpNode(bookmarkNode) {
   const li = document.createElement('li');
   li.className = 'bookmark-item'; // クラス名を追加
   li.appendChild(anchor);
-  // 削除ボタンを追加
-  const removeButton = createRemoveButton(bookmarkNode.id);
-  li.appendChild(removeButton);
+  if (bookmarkNode.url) {
+    // 削除ボタンを追加
+    const removeButton = createRemoveButton(bookmarkNode.id);
+    li.appendChild(removeButton);
+  }
+
 
   if (bookmarkNode.children && bookmarkNode.children.length > 0) {
     const childList = dumpTreeNodes(bookmarkNode.children);
@@ -169,4 +176,12 @@ function createRemoveButton(bookmarkId) {
     removeBookmark(bookmarkId);
   });
   return button;
+}
+
+// ブックマークを削除する関数
+function removeBookmark(bookmarkId) {
+  chrome.bookmarks.remove(bookmarkId, () => {
+    console.log('Bookmark removed:', bookmarkId);
+    chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+  });
 }
