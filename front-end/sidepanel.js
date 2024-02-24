@@ -1,3 +1,16 @@
+// ファビコンURLを生成する関数
+function faviconURL(u) {
+  try {
+    const url = new URL(chrome.runtime.getURL("/_favicon/"));
+    url.searchParams.set("pageUrl", u);
+    url.searchParams.set("size", "64");
+    return url.toString();
+  } catch (error) {
+    console.error("Error constructing favicon URL:", error);
+    return ""; // or provide a default favicon URL
+  }
+}
+
 // Traverse the bookmark tree, and print the folder and nodes.
 function dumpBookmarks() {
   chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
@@ -16,8 +29,6 @@ function dumpBookmarks() {
 function dumpTreeNodes(bookmarkNodes) {
   const list = document.createElement('ul');
   list.className = 'bookmark-list'; // クラス名を追加
-  
-  
   for (let i = 0; i < bookmarkNodes.length; i++) {
     list.appendChild(dumpNode(bookmarkNodes[i]));
   }
@@ -30,15 +41,43 @@ function dumpNode(bookmarkNode) {
   anchor.className = 'bookmark-link'; // クラス名を追加
   anchor.textContent = bookmarkNode.title;
 
-  // クリックイベントを追加
-  anchor.addEventListener('click', function (event) {
-    console.log('click event');
+
+    // テキストの文字数制限
+    const maxLength = 12; // 最大の文字数
+    let text = bookmarkNode.title;
+    if (text.length > maxLength) {
+      text = text.substring(0, maxLength) + '...'; // 切り詰める
+    }
+    anchor.textContent = text;
+
+
+  // ファビコンを表示するためのimg要素を作成
+  const img = document.createElement('img');
+  img.className = 'favicon'; // クラス名を追加
+
+  if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+    // フォルダの場合はデフォルトで閉じているアイコンを表示
+    img.src = 'icons/folder_96.png';
+  } else if (bookmarkNode.url) {
+    // ブックマークの場合はファビコンを表示
+    img.src = faviconURL(bookmarkNode.url);
+  }
+
+  // ファビコンのクリックイベントを追加
+  img.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
     if (bookmarkNode.children && bookmarkNode.children.length > 0) {
       // 子ノードがある場合はそれを表示
-      const ul = this.parentElement.querySelector('ul'); // クリックされたアンカーの親要素の <ul> を取得
-      if (ul) {
-        ul.style.display = ul.style.display === 'none' ? '' : 'none'; // 表示状態を切り替える
+      const childList = this.nextSibling.nextSibling;
+      childList.style.display = childList.style.display === 'none' ? '' : 'none';
+      // フォルダの開閉状態に応じてアイコンを切り替え
+      this.src = childList.style.display === 'none' ? 'icons/folder_96.png' : 'icons/folder_opened_96.png';
+
+      // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+      if (childList.style.display !== 'none') {
+        const sidebar = document.getElementById('bookmarks');
+        sidebar.innerHTML = ''; // サイドバーをクリア
+        sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
       }
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
@@ -48,6 +87,7 @@ function dumpNode(bookmarkNode) {
 
   const li = document.createElement('li');
   li.className = 'bookmark-item'; // クラス名を追加
+  li.appendChild(img); // ファビコンを追加
   li.appendChild(anchor);
   if (bookmarkNode.url) {
     // 編集ボタンを追加
