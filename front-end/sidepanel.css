@@ -1,5 +1,6 @@
 body {
   margin: 0 30px; /* マージンをリセット */
+  background-color: #FDDDC9;
 }
 
 ul {
@@ -23,7 +24,7 @@ li {
 a {
   display: block; /* ブロック要素として表示 */
   padding: 5px 10px; /* パディングを追加 */
-  background-color: #f0f0f0; /* 背景色 */
+  background-color: #FCB98C; /* 背景色 */
   color: #333; /* 文字色 */
   text-decoration: none; /* 下線を非表示 */
   border-radius: 5px; /* 角を丸める */
@@ -31,7 +32,7 @@ a {
   
   /* リンクにホバーしたときのスタイル */
   a:hover {
-    background-color: #e0e0e0; /* 背景色を変更 */
+    background-color: #FDDDC9; /* 背景色を変更 */
   }  
 
 
@@ -45,18 +46,29 @@ a {
   height: 20px; 
 }
 
+/* 整理 */
 #arrangeButton{
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: blue;
-  color: white;
+  background-color: #8C5024;
+  color: #FDDDC9;
+  height: 30px;
+}
+
+/* フォルダ作成 */
+#createFolder{
+  position: absolute;
+  top: 10px;
+  right: 70px;
+  background-color: #8C5024;
+  color: #FDDDC9;
   height: 30px;
 }
 
 /* リンクにホバーしたときのスタイル */
 a:hover {
-  background-color: #e0e0e0; /* 背景色を変更 */
+  background-color: #FDDDC9; /* 背景色を変更 */
 }
 
 /* ファビコンのスタイル */
@@ -70,3 +82,4 @@ a:hover {
   left: 10px;
   top: 10px;
 }
+
