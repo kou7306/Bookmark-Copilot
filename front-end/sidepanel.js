@@ -228,17 +228,11 @@ function displaySearchResults(results, searchTerm) {
 
   // 検索結果の処理
   results.forEach(function(bookmark) {
-    console.log(bookmark);
+ 
     // ブックマークの名前に検索語が含まれる場合のみリストに追加
-    if (bookmark.title.toLowerCase().includes(searchTerm.toLowerCase())) {
-      var listItem = document.createElement('li');
-      var link = document.createElement('a');
-      link.textContent = bookmark.title;
-      link.href = bookmark.url;
-      link.target = '_blank'; // リンクを新しいタブで開く
-      listItem.appendChild(link);
-      bookmarksList.appendChild(listItem);
-    }
+
+    bookmarksList.appendChild(dumpNode(bookmark));
+
   });
 
   // 検索結果がない場合はメッセージを表示
@@ -249,18 +243,36 @@ function displaySearchResults(results, searchTerm) {
   }
 }
 
+
 // ブックマークを名前から検索する関数
 function searchBookmarks() {
   var searchInput = document.getElementById('searchInput');
   var searchTerm = searchInput.value.trim();
-  console.log(searchTerm);
 
-  // 検索語が空でない場合のみ検索を実行
-  if (searchTerm !== '') {
+  // 検索語が空でない場合に検索を実行
+  if (searchTerm) {
     chrome.bookmarks.search(searchTerm, function(results) {
-      displaySearchResults(results, searchTerm); // searchTermを渡す
+      displaySearchResults(results, searchTerm);
+    });
+  } else {
+    // 検索語が空の場合は全てのブックマークを表示
+    chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+      var allBookmarks = [];
+      extractBookmarks(bookmarkTreeNodes, allBookmarks);
+      displaySearchResults(allBookmarks, searchTerm);
     });
   }
+}
+
+// ブックマークツリーからブックマークを抽出する関数
+function extractBookmarks(nodes, bookmarks) {
+  nodes.forEach(function(node) {
+    if (node.children) {
+      extractBookmarks(node.children, bookmarks);
+    } else {
+      bookmarks.push(node);
+    }
+  });
 }
 
 
