@@ -16,7 +16,7 @@ function dumpBookmarks() {
 function dumpTreeNodes(bookmarkNodes) {
   const list = document.createElement('ul');
   list.className = 'bookmark-list'; // クラス名を追加
-  console.log(bookmarkNodes);
+  
   
   for (let i = 0; i < bookmarkNodes.length; i++) {
     list.appendChild(dumpNode(bookmarkNodes[i]));
@@ -67,12 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // searchInput が存在する場合のみ、イベントリスナーを追加
   if (searchInput !== null) {
     // 検索入力フィールドの変更イベントを監視して検索を実行
-    searchInput.addEventListener('input', function() {
       searchBookmarks();
-    });
-  }
-});
-
+    }
+  });
 
 
 
@@ -115,3 +112,10 @@ function searchBookmarks() {
     });
   }
 }
+// メッセージリスナーを追加してブックマークの更新を監視
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'updateBookmarks') {
+    console.log('bookmarks updated!');
+    window.location.reload();
+  }
+});

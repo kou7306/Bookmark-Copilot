@@ -58,6 +58,8 @@ chrome.bookmarks.onCreated.addListener(function(id, bookmarkNode) {
         
         // フォルダIDが見つかった場合、ブックマークをそのフォルダに移動
         chrome.bookmarks.move(bookmarkNode.id, { parentId: folderId }); 
+
+        chrome.runtime.sendMessage({ action: 'updateBookmarks' });
       }
     })
     .catch(error => {
@@ -123,3 +125,10 @@ function findMatchingFolderName(responseText, folderNames) {
   }
   return null;
 }
+
+
+
+
+chrome.bookmarks.onRemoved.addListener(() => {
+  chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+});
