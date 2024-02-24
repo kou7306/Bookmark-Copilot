@@ -19,6 +19,7 @@ function dumpBookmarks() {
       const children = bookmarkTreeNodes[i].children;
       if (children && children.length > 0) {
         for (let j = 0; j < children.length; j++) {
+          
           document.getElementById('bookmarks').appendChild(dumpTreeNodes(children[j].children));
         }
       }
