@@ -38,33 +38,40 @@ chrome.action.onClicked.addListener((tab) => {
 //  ブックマークイベントを受け取る
 chrome.bookmarks.onCreated.addListener(function(id, bookmarkNode) {
   console.log('New bookmark added:', bookmarkNode.url);
-  const url = bookmarkNode.url;
+  selectFolder(bookmarkNode);
+  chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+});
 
+// ブックマークのフォルダを変更する関数
+function selectFolder(bookmarkNode) {
+  const url = bookmarkNode.url;
   getRootBookmarkFolders()  // ルートにあるブックマークのフォルダ情報を取得
     .then(folders => {
       console.log('Sending folders to API:', folders);
       return sendRequestToApi(url, folders).then(response => {
+        console.log('API response:', response.folder);
         return { response, folders };  // APIレスポンスとフォルダリストを次のステップに渡す
       });
     })
     .then(({ response, folders }) => {
-      console.log('API response:', response);
+      
       const recommendedFolderName = findMatchingFolderName(response.folder, folders);  // レスポンスからフォルダ名を探す
       return findFolderId(recommendedFolderName);  // フォルダ名に対応するフォルダIDを探す
     })
     .then(folderId => {
-      console.log('Found matching folder ID:', folderId);
       if (folderId) {
         
         // フォルダIDが見つかった場合、ブックマークをそのフォルダに移動
         chrome.bookmarks.move(bookmarkNode.id, { parentId: folderId }); 
+        console.log('Moved bookmark to folder:', folderId);
+
+        
       }
     })
     .catch(error => {
       console.error('Error:', error);
     });
-});
-
+}
 
 // APIにリクエストを送信する関数
 function sendRequestToApi(url,folderData) {
@@ -73,6 +80,7 @@ function sendRequestToApi(url,folderData) {
     url: url,
     folderData: folderData
   };
+  console.log('Sending request to API:', requestBody);
   return fetch(apiUrl, {
     method: 'POST',
     headers: {
@@ -80,7 +88,11 @@ function sendRequestToApi(url,folderData) {
     },
     body: JSON.stringify(requestBody),
   })
-  .then(response => response.json());
+  .then(response => response.json())
+  .then(data => {
+    console.log('folder response:', data.folder);
+    return data;
+  });
 }
 
 // ルートにあるブックマークのフォルダ情報を取得する関数
@@ -123,3 +135,31 @@ function findMatchingFolderName(responseText, folderNames) {
   }
   return null;
 }
+
+
+
+
+
+
+// メッセージリスナーを追加してブックマークの更新を監視
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'sortBookmarks') {
+    console.log('sorted bookmark list:', message.bookmarks);
+    message.bookmarks.forEach(bookmark => {
+      selectFolder(bookmark);
+    });
+  }
+
+
+});
+
+// ブックマークが移動されたときのイベントリスナー
+chrome.bookmarks.onMoved.addListener((id, moveInfo) => {
+  console.log('Bookmark moved:', moveInfo);
+  // 移動されたブックマークの処理を行う
+  chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+});
+
+chrome.bookmarks.onRemoved.addListener(() => {
+  chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+});
