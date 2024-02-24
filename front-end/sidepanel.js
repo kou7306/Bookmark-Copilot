@@ -214,6 +214,10 @@ document.addEventListener('DOMContentLoaded', function () {
 // searchInput 要素を取得
 var searchInput = document.getElementById('searchInput');
 
+if (searchInput == null) {
+  window.location.reload();
+}
+
 // searchInput が存在する場合のみ、イベントリスナーを追加
 if (searchInput !== null) {
   // 検索入力フィールドの変更イベントを監視して検索を実行
@@ -248,6 +252,7 @@ function displaySearchResults(results, searchTerm) {
 function searchBookmarks() {
   var searchInput = document.getElementById('searchInput');
   var searchTerm = searchInput.value.trim();
+  
 
   // 検索語が空でない場合に検索を実行
   if (searchTerm) {
@@ -255,12 +260,7 @@ function searchBookmarks() {
       displaySearchResults(results, searchTerm);
     });
   } else {
-    // 検索語が空の場合は全てのブックマークを表示
-    chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-      var allBookmarks = [];
-      extractBookmarks(bookmarkTreeNodes, allBookmarks);
-      displaySearchResults(allBookmarks, searchTerm);
-    });
+    window.location.reload();
   }
 }
 
