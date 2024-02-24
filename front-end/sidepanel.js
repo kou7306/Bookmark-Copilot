@@ -1,9 +1,14 @@
 // ファビコンURLを生成する関数
 function faviconURL(u) {
-  const url = new URL(chrome.runtime.getURL("/_favicon/"));
-  url.searchParams.set("pageUrl", u);
-  url.searchParams.set("size", "64");
-  return url.toString();
+  try {
+    const url = new URL(chrome.runtime.getURL("/_favicon/"));
+    url.searchParams.set("pageUrl", u);
+    url.searchParams.set("size", "64");
+    return url.toString();
+  } catch (error) {
+    console.error("Error constructing favicon URL:", error);
+    return ""; // or provide a default favicon URL
+  }
 }
 
 // Traverse the bookmark tree, and print the folder and nodes.
