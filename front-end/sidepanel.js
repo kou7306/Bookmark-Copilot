@@ -1,28 +1,19 @@
-let parentNodes = []; // 開いたフォルダの親フォルダを記録するスタック
+// HTML要素を作成します
+let icon = document.createElement('img');
 
-// フォルダを開くたびに「戻る」ボタンを表示
-function showBackButton() {
-  const backButton = document.getElementById('back-button');
-  if (parentNodes.length > 0) {
-    // フォルダを開いたときだけ「戻る」ボタンを表示
-    backButton.style.display = '';
-  } else {
-    // ルートノードにいるときは「戻る」ボタンを非表示
-    backButton.style.display = 'none';
-  }
-}
+// アイコンのソースを設定します
+icon.src = './images/back.png';
 
-// 「戻る」ボタンがクリックされたときの処理
-document.getElementById('back-button').addEventListener('click', function () {
-  if (parentNodes.length > 0) {
-    const parentNode = parentNodes.pop(); // 最後に開いたフォルダの親フォルダを取得
-    const sidebar = document.getElementById('bookmarks');
-    sidebar.innerHTML = ''; // サイドバーをクリア
-    sidebar.appendChild(dumpTreeNodes(parentNode.children)); // 親フォルダを開く
-    showBackButton(); // 「戻る」ボタンの表示を更新
-  }
+// アイコンにクリックイベントリスナーを追加します
+icon.addEventListener('click', function() {
+    window.location.reload();
 });
 
+// アイコンにクラスを追加します
+icon.className = 'reload-icon';
+
+// アイコンをbodyに追加します
+document.body.appendChild(icon);
 
 // ファビコンURLを生成する関数
 function faviconURL(u) {
@@ -55,12 +46,67 @@ function dumpBookmarks() {
 function dumpTreeNodes(bookmarkNodes) {
   const list = document.createElement('ul');
   list.className = 'bookmark-list'; // クラス名を追加
+  //　フォルダのみを最初に表示する
   for (let i = 0; i < bookmarkNodes.length; i++) {
+
+  // ノードがフォルダであるかどうかをチェック
+  if (bookmarkNodes[i].children) {
+    // フォルダの場合、処理を行う
     list.appendChild(dumpNode(bookmarkNodes[i]));
   }
 
+  }
+  // フォルダ以外のノードを表示する
+  for (let i = 0; i < bookmarkNodes.length; i++) {
+    if (!bookmarkNodes[i].children) {
+      list.appendChild(dumpNode(bookmarkNodes[i]));
+    }
+  }
+
+
+  //最終アクセス日時ソート系処理
+  // フォルダ以外のノードを表示する
+  // let bookmarks = [];
+
+  // // ブックマークを抽出
+  // for (let i = 0; i < bookmarkNodes.length; i++) {
+  //   if (!bookmarkNodes[i].children) {
+  //     bookmarks.push(bookmarkNodes[i]);
+  //   }
+  // }
+  
+  // // 履歴の最終アクセス日時を取得してブックマークをソート
+  // getBookmarkAccessTimes(bookmarks).then(sortedBookmarks => {
+  //   // ソートされたブックマークを処理
+  //   for (let bookmark of sortedBookmarks) {
+  //     // ここでブックマークを表示するなどの処理を行う
+  //     list.appendChild(dumpNode(bookmark));
+  //   }
+  // });
+
   return list;
 }
+
+
+// // ブックマークの履歴の最終アクセス日時を取得してソートする関数
+// function getBookmarkAccessTimes(bookmarks) {
+//   return Promise.all(bookmarks.map(bookmark => {
+//     return new Promise(resolve => {
+//       chrome.history.search({text: bookmark.url, maxResults: 1}, historyItems => {
+//         if (historyItems.length > 0) {
+//           bookmark.lastVisitTime = historyItems[0].lastVisitTime;
+//         } else {
+//           bookmark.lastVisitTime = 0; // 履歴がない場合は0とする
+//         }
+//         resolve(bookmark);
+//       });
+//     });
+//   })).then(bookmarks => {
+//     // 最終アクセス日時でソート
+//     return bookmarks.sort((a, b) => b.lastVisitTime - a.lastVisitTime);
+//   });
+// }
+
 
 function dumpNode(bookmarkNode) {
   const anchor = document.createElement('a');
@@ -81,7 +127,7 @@ function dumpNode(bookmarkNode) {
   const img = document.createElement('img');
   img.className = 'favicon'; // クラス名を追加
 
-  if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+  if (bookmarkNode.children) {
     // フォルダの場合はデフォルトで閉じているアイコンを表示
     img.src = 'icons/folder_96.png';
   } else if (bookmarkNode.url) {
@@ -174,17 +220,11 @@ function displaySearchResults(results, searchTerm) {
 
   // 検索結果の処理
   results.forEach(function(bookmark) {
-    console.log(bookmark);
+ 
     // ブックマークの名前に検索語が含まれる場合のみリストに追加
-    if (bookmark.title.toLowerCase().includes(searchTerm.toLowerCase())) {
-      var listItem = document.createElement('li');
-      var link = document.createElement('a');
-      link.textContent = bookmark.title;
-      link.href = bookmark.url;
-      link.target = '_blank'; // リンクを新しいタブで開く
-      listItem.appendChild(link);
-      bookmarksList.appendChild(listItem);
-    }
+
+    bookmarksList.appendChild(dumpNode(bookmark));
+
   });
 
   // 検索結果がない場合はメッセージを表示
@@ -195,18 +235,36 @@ function displaySearchResults(results, searchTerm) {
   }
 }
 
+
 // ブックマークを名前から検索する関数
 function searchBookmarks() {
   var searchInput = document.getElementById('searchInput');
   var searchTerm = searchInput.value.trim();
-  console.log(searchTerm);
 
-  // 検索語が空でない場合のみ検索を実行
-  if (searchTerm !== '') {
+  // 検索語が空でない場合に検索を実行
+  if (searchTerm) {
     chrome.bookmarks.search(searchTerm, function(results) {
-      displaySearchResults(results, searchTerm); // searchTermを渡す
+      displaySearchResults(results, searchTerm);
+    });
+  } else {
+    // 検索語が空の場合は全てのブックマークを表示
+    chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+      var allBookmarks = [];
+      extractBookmarks(bookmarkTreeNodes, allBookmarks);
+      displaySearchResults(allBookmarks, searchTerm);
     });
   }
+}
+
+// ブックマークツリーからブックマークを抽出する関数
+function extractBookmarks(nodes, bookmarks) {
+  nodes.forEach(function(node) {
+    if (node.children) {
+      extractBookmarks(node.children, bookmarks);
+    } else {
+      bookmarks.push(node);
+    }
+  });
 }
 
 
