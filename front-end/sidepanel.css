@@ -5,7 +5,7 @@ ul {
   margin-top: 10px;
   margin-bottom: 10px;
   display: grid; /* グリッド表示にする */
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* グリッドの列を自動的に調整 */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* グリッドの列を自動的に調整 */
   grid-gap: 10px; /* グリッドのギャップ（マージン）を設定 */
 }
   
@@ -29,4 +29,10 @@ a {
 /* リンクにホバーしたときのスタイル */
 a:hover {
   background-color: #e0e0e0; /* 背景色を変更 */
+}
+
+/* ファビコンのスタイル */
+.favicon {
+  width: 128px; /* 幅を16pxに設定 */
+  height: 128px; /* 高さを16pxに設定 */
 }
