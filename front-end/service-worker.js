@@ -139,9 +139,6 @@ function findMatchingFolderName(responseText, folderNames) {
 
 
 
-chrome.bookmarks.onRemoved.addListener(() => {
-  chrome.runtime.sendMessage({ action: 'updateBookmarks' });
-});
 
 
 // メッセージリスナーを追加してブックマークの更新を監視
@@ -153,5 +150,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 
+
+});
+
+// ブックマークが移動されたときのイベントリスナー
+chrome.bookmarks.onMoved.addListener((id, moveInfo) => {
+  console.log('Bookmark moved:', moveInfo);
+  // 移動されたブックマークの処理を行う
+  chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+});
+
+chrome.bookmarks.onRemoved.addListener(() => {
   chrome.runtime.sendMessage({ action: 'updateBookmarks' });
 });
