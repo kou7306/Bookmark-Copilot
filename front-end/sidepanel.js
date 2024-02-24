@@ -38,6 +38,7 @@ function dumpBookmarks() {
       const children = bookmarkTreeNodes[i].children;
       if (children && children.length > 0) {
         for (let j = 0; j < children.length; j++) {
+          
           document.getElementById('bookmarks').appendChild(dumpTreeNodes(children[j].children));
         }
       }
@@ -164,7 +165,7 @@ function dumpNode(bookmarkNode) {
   li.className = 'bookmark-item'; // クラス名を追加
   li.appendChild(img); // ファビコンを追加
   li.appendChild(anchor);
-  if (bookmarkNode.url) {
+  if (true) {
     // 編集ボタンを追加
 
     const button = document.createElement('button');
@@ -327,13 +328,24 @@ function createRemoveButton(bookmarkId) {
 function removeBookmark(bookmarkId) {
   // 確認用のダイアログを表示し、"OK" が選択された場合のみブックマークを削除する
   if (confirm('ほんとに削除してもよろしいですか?')) {
-    chrome.bookmarks.remove(bookmarkId, () => {
-      console.log('Bookmark removed:', bookmarkId);
-      chrome.runtime.sendMessage({ action: 'updateBookmarks' });
-
+    chrome.bookmarks.getSubTree(bookmarkId, (subTree) => {
+      if (subTree && subTree.length > 0 && subTree[0].children && subTree[0].children.length > 0) {
+        // フォルダー内にブックマークが存在する場合は、フォルダーとその中身を一括で削除する
+        chrome.bookmarks.removeTree(bookmarkId, () => {
+          console.log('Folder and its contents removed:', bookmarkId);
+          chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+        });
+      } else {
+        // フォルダー内にブックマークが存在しない場合は、単にフォルダーを削除する
+        chrome.bookmarks.remove(bookmarkId, () => {
+          console.log('Folder removed:', bookmarkId);
+          chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+        });
+      }
     });
   }
 }
+
 
 
 function createMoveButton(bookmarkId,dialog) {
