@@ -1,27 +1,32 @@
 /* リスト全体のスタイル */
 ul {
-    list-style-type: none; /* リストマーカーを非表示 */
-    padding: 0; /* パディングをリセット */
-    margin-top: 10px;
-    margin-bottom: 10px
-  }
+  list-style-type: none; /* リストマーカーを非表示 */
+  padding: 0; /* パディングをリセット */
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: grid; /* グリッド表示にする */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* グリッドの列を自動的に調整 */
+  grid-gap: 10px; /* グリッドのギャップ（マージン）を設定 */
+}
   
-  /* 各リストアイテムのスタイル */
-  li {
-    margin-bottom: 10px; /* アイテム間のマージン */
-  }
+/* 各リストアイテムのスタイル */
+li {
+  margin-bottom: 10px; /* アイテム間のマージン */
+  display: flex; /* フレックスボックスとして表示 */
+  flex-direction: column; /* 子要素を縦方向に並べる */
+}
   
-  /* リンクのスタイル */
-  a {
-    display: block; /* ブロック要素として表示 */
-    padding: 5px 10px; /* パディングを追加 */
-    background-color: #f0f0f0; /* 背景色 */
-    color: #333; /* 文字色 */
-    text-decoration: none; /* 下線を非表示 */
-    border-radius: 5px; /* 角を丸める */
-  }
+/* リンクのスタイル */
+a {
+  display: block; /* ブロック要素として表示 */
+  padding: 5px 10px; /* パディングを追加 */
+  background-color: #f0f0f0; /* 背景色 */
+  color: #333; /* 文字色 */
+  text-decoration: none; /* 下線を非表示 */
+  border-radius: 5px; /* 角を丸める */
+}
   
-  /* リンクにホバーしたときのスタイル */
-  a:hover {
-    background-color: #e0e0e0; /* 背景色を変更 */
-  }  
+/* リンクにホバーしたときのスタイル */
+a:hover {
+  background-color: #e0e0e0; /* 背景色を変更 */
+}
