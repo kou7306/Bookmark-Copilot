@@ -1,3 +1,20 @@
+// HTML要素を作成します
+let icon = document.createElement('img');
+
+// アイコンのソースを設定します
+icon.src = './images/back.png';
+
+// アイコンにクリックイベントリスナーを追加します
+icon.addEventListener('click', function() {
+    window.location.reload();
+});
+
+// アイコンにクラスを追加します
+icon.className = 'reload-icon';
+
+// アイコンをbodyに追加します
+document.body.appendChild(icon);
+
 // ファビコンURLを生成する関数
 function faviconURL(u) {
   try {
@@ -135,10 +152,7 @@ function dumpNode(bookmarkNode) {
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
 document.addEventListener('DOMContentLoaded', function () {
   dumpBookmarks();
-
-
-
-  });
+});
 
 
 // 検索に関する処理
