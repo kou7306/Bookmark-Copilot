@@ -1,4 +1,7 @@
-/* リスト全体のスタイル */
+body {
+  margin: 0; /* マージンをリセット */
+}
+
 ul {
     list-style-type: none; /* リストマーカーを非表示 */
     padding: 0; /* パディングをリセット */
@@ -25,3 +28,24 @@ ul {
   a:hover {
     background-color: #e0e0e0; /* 背景色を変更 */
   }  
+
+
+.searchInput{
+  text-align: center;
+
+  margin-top: 10px;
+}
+
+.searchInput input{
+  height: 20px; 
+}
+
+#arrangeButton{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: blue;
+  color: white;
+  height: 30px;
+}
+
