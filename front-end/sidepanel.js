@@ -55,10 +55,14 @@ function dumpNode(bookmarkNode) {
 
   // クリックイベントを追加
   anchor.addEventListener('click', function (event) {
+    console.log('click event');
     event.preventDefault();  // デフォルトのリンクの挙動を防止
     if (bookmarkNode.children && bookmarkNode.children.length > 0) {
       // 子ノードがある場合はそれを表示
-      this.nextSibling.style.display = this.nextSibling.style.display === 'none' ? '' : 'none';
+      const ul = this.parentElement.querySelector('ul'); // クリックされたアンカーの親要素の <ul> を取得
+      if (ul) {
+        ul.style.display = ul.style.display === 'none' ? '' : 'none'; // 表示状態を切り替える
+      }
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
@@ -69,6 +73,12 @@ function dumpNode(bookmarkNode) {
   li.className = 'bookmark-item'; // クラス名を追加
   li.appendChild(img); // ファビコンを追加
   li.appendChild(anchor);
+  if (bookmarkNode.url) {
+    // 削除ボタンを追加
+    const removeButton = createRemoveButton(bookmarkNode.id);
+    li.appendChild(removeButton);
+  }
+
 
   if (bookmarkNode.children && bookmarkNode.children.length > 0) {
     const childList = dumpTreeNodes(bookmarkNode.children);
@@ -79,20 +89,31 @@ function dumpNode(bookmarkNode) {
   return li;
 }
 
+
+
+
+
+// ここからHTML以外
+
+
 // DOMContentLoadedイベントが発生したらブックマーク情報を表示
 document.addEventListener('DOMContentLoaded', function () {
   dumpBookmarks();
 
-  // searchInput 要素を取得
-  var searchInput = document.getElementById('searchInput');
 
-  // searchInput が存在する場合のみ、イベントリスナーを追加
-  if (searchInput !== null) {
-    // 検索入力フィールドの変更イベントを監視して検索を実行
-      searchBookmarks();
-    }
+
   });
 
+
+// 検索に関する処理
+// searchInput 要素を取得
+var searchInput = document.getElementById('searchInput');
+
+// searchInput が存在する場合のみ、イベントリスナーを追加
+if (searchInput !== null) {
+  // 検索入力フィールドの変更イベントを監視して検索を実行
+  searchInput.addEventListener('input', searchBookmarks);
+}
 
 
 // 検索結果の表示をリスト形式に変更する関数
@@ -102,6 +123,7 @@ function displaySearchResults(results, searchTerm) {
 
   // 検索結果の処理
   results.forEach(function(bookmark) {
+    console.log(bookmark);
     // ブックマークの名前に検索語が含まれる場合のみリストに追加
     if (bookmark.title.toLowerCase().includes(searchTerm.toLowerCase())) {
       var listItem = document.createElement('li');
@@ -126,6 +148,7 @@ function displaySearchResults(results, searchTerm) {
 function searchBookmarks() {
   var searchInput = document.getElementById('searchInput');
   var searchTerm = searchInput.value.trim();
+  console.log(searchTerm);
 
   // 検索語が空でない場合のみ検索を実行
   if (searchTerm !== '') {
@@ -134,6 +157,10 @@ function searchBookmarks() {
     });
   }
 }
+
+
+
+
 // メッセージリスナーを追加してブックマークの更新を監視
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('message received:', message);
@@ -164,3 +191,21 @@ function sortBookmarksToFolder() {
     });
     
   }
+
+  // ブックマークの削除ボタンを作成する関数
+function createRemoveButton(bookmarkId) {
+  const button = document.createElement('button');
+  button.textContent = '削除';
+  button.addEventListener('click', () => {
+    removeBookmark(bookmarkId);
+  });
+  return button;
+}
+
+// ブックマークを削除する関数
+function removeBookmark(bookmarkId) {
+  chrome.bookmarks.remove(bookmarkId, () => {
+    console.log('Bookmark removed:', bookmarkId);
+    chrome.runtime.sendMessage({ action: 'updateBookmarks' });
+  });
+}
