@@ -72,6 +72,13 @@ function dumpNode(bookmarkNode) {
       childList.style.display = childList.style.display === 'none' ? '' : 'none';
       // フォルダの開閉状態に応じてアイコンを切り替え
       this.src = childList.style.display === 'none' ? 'icons/folder_96.png' : 'icons/folder_opened_96.png';
+
+      // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+      if (childList.style.display !== 'none') {
+        const sidebar = document.getElementById('bookmarks');
+        sidebar.innerHTML = ''; // サイドバーをクリア
+        sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+      }
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
