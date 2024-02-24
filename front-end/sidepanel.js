@@ -168,25 +168,27 @@ function dumpNode(bookmarkNode) {
   if (true) {
     // 編集ボタンを追加
 
-    const button = document.createElement('button');
-    button.addEventListener('click', () => {
-      // ボタンがクリックされたときの処理
-      console.log('Button clicked!');
-      showActionsDialog(bookmarkNode.id);
+    const link = document.createElement('a');
+    link.className = 'edit-link'; // クラス名を追加
+    link.href = '#'; // リンク先を設定
+    link.addEventListener('click', (event) => {
+        event.preventDefault(); // デフォルトのリンク動作をキャンセル
+        showActionsDialog(bookmarkNode.id);
     });
-
+    
     // 画像を表示する img 要素を作成
     const image = document.createElement('img');
     image.src = './images/edit.png'; // 画像のパスを設定
     image.alt = 'Image Alt Text'; // 画像の代替テキストを設定
-
-    // img 要素を button 要素に追加
-    button.appendChild(image);
+    
+    // img 要素を a 要素に追加
+    link.appendChild(image);
+    
 
 
 
     // 生成した <a> 要素を DOM に追加
-    li.appendChild(button);
+    li.appendChild(link);
     
 
   }
