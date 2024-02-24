@@ -53,6 +53,9 @@ function dumpNode(bookmarkNode) {
     // 削除ボタンを追加
     const removeButton = createRemoveButton(bookmarkNode.id);
     li.appendChild(removeButton);
+
+    const moveButton = createMoveButton(bookmarkNode.id);
+    li.appendChild(moveButton);
   }
 
 
@@ -184,4 +187,70 @@ function removeBookmark(bookmarkId) {
     console.log('Bookmark removed:', bookmarkId);
     chrome.runtime.sendMessage({ action: 'updateBookmarks' });
   });
+}
+
+function createMoveButton(bookmarkId) {
+  const button = document.createElement('button');
+  button.textContent = '移動';
+  button.addEventListener('click', async () => {
+    
+    const folderId = await selectFolder(); // フォルダを選択
+    if (folderId) {
+      moveBookmark(bookmarkId, folderId); // ブックマークを移動
+    }
+  });
+  return button;
+}
+async function selectFolder() {
+  return new Promise((resolve) => {
+    const folders = []; // ブックマークツリーから取得したフォルダの配列
+
+    // ブックマークツリーを取得してフォルダを抽出
+    chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+      const folders = bookmarkTreeNodes[0].children
+    .filter(node => !node.url)  // ルートレベルのフォルダを抽出
+    .flatMap(folder => folder.children.filter(subNode => !subNode.url))  // 各フォルダの子ノードからさらにフォルダを抽出
+ 
+  
+
+      // カスタムダイアログを作成
+      const dialog = document.createElement('div');
+      dialog.style.position = 'fixed';
+      dialog.style.top = '50%';
+      dialog.style.left = '50%';
+      dialog.style.transform = 'translate(-50%, -50%)';
+      dialog.style.backgroundColor = '#fff';
+      dialog.style.padding = '20px';
+      dialog.style.border = '1px solid #ccc';
+      dialog.style.zIndex = '9999';
+
+      // フォルダ名のリストを表示
+      const list = document.createElement('ul');
+      folders.forEach((folder, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = folder.title;
+        listItem.style.cursor = 'pointer';
+        listItem.addEventListener('click', () => {
+          dialog.remove(); // ダイアログを閉じる
+          resolve(folder.id); // 選択されたフォルダのIDを解決して返す
+        });
+        list.appendChild(listItem);
+      });
+
+      // ダイアログにリストを追加
+      dialog.appendChild(list);
+
+      // ボディにダイアログを追加
+      document.body.appendChild(dialog);
+    });
+  });
+}
+
+
+
+
+
+
+async function moveBookmark(bookmarkId, folderId) {
+  chrome.bookmarks.move(bookmarkId, { parentId: folderId });
 }
