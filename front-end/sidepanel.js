@@ -44,8 +44,11 @@ function dumpNode(bookmarkNode) {
   // ファビコンのクリックイベントを追加
   img.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
-    if (bookmarkNode.url) {
-      // URLがある場合は新しいタブでリンクを開く
+    if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+      // 子ノードがある場合はそれを表示
+      this.nextSibling.nextSibling.style.display = this.nextSibling.nextSibling.style.display === 'none' ? '' : 'none';
+    } else if (bookmarkNode.url) {
+      // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
     }
   });
