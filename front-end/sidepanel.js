@@ -15,6 +15,8 @@ icon.className = 'reload-icon';
 // アイコンをbodyに追加します
 document.body.appendChild(icon);
 
+icon.style.display = 'none';
+
 // ファビコンURLを生成する関数
 function faviconURL(u) {
   try {
@@ -147,6 +149,7 @@ function dumpNode(bookmarkNode) {
 
       // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
       if (childList.style.display !== 'none') {
+        icon.style.display = 'block';
         const sidebar = document.getElementById('bookmarks');
         sidebar.innerHTML = ''; // サイドバーをクリア
         sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
