@@ -1,6 +1,6 @@
 body {
   margin: 0 30px; /* マージンをリセット */
-  background-color: #2E436E;
+  background-color: #2B2D30;
 }
 
 ul {
@@ -13,18 +13,13 @@ ul {
   grid-gap: 50px; /* グリッドのギャップ（マージン）を設定 */
   grid-auto-rows: repeat(1fr);
 }
-  
-/* 各リストアイテムのスタイル */
-li {
+
+.bookmark-item{
+  position: relative;
+  padding: 15px; /* パディングを追加 */
   margin-bottom: 10px; /* アイテム間のマージン */
   display: flex; /* フレックスボックスとして表示 */
   flex-direction: column; /* 子要素を縦方向に並べる */
-
-
-}
-.bookmark-item{
-  position: relative;
-  padding: 5px; /* パディングを追加 */
 }
   
 /* リンクのスタイル */
@@ -49,8 +44,8 @@ a {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #1E1F22;
-  color: whitesmoke;
+  background-color: #1e90ff;
+  color: white;
   height: 30px;
   border-radius: 5px;
 }
@@ -62,8 +57,9 @@ a {
   bottom: 10px;
   right: 10px;
   font-size: 50px;
-  color: #1E1F22;
+  color: #1e90ff;
   z-index: 9999;
+  cursor: pointer;
 }
 
 
@@ -81,8 +77,19 @@ a {
 
 
 .edit-link{
+  cursor: pointer;  
   position: absolute;
-  right: -25px;
+  right: -5px;
   top: 2px;
   background-color: transparent;
+ 
+}
+
+.edit-link img{
+  color: white;
+}
+
+.material-symbols-outlined
+{
+  color: white;
 }

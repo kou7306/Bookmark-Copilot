@@ -1,8 +1,8 @@
 // HTML要素を作成します
-let icon = document.createElement('img');
+let icon = document.createElement('span');
 
-// アイコンのソースを設定します
-icon.src = './images/back.png';
+// アイコンのテキストを設定します
+icon.textContent = 'arrow_back';
 
 // アイコンにクリックイベントリスナーを追加します
 icon.addEventListener('click', function() {
@@ -10,13 +10,12 @@ icon.addEventListener('click', function() {
 });
 
 // アイコンにクラスを追加します
-icon.className = 'reload-icon';
+icon.className = 'material-symbols-outlined reload-icon';
 
 // アイコンをbodyに追加します
 document.body.appendChild(icon);
 
-icon.style.display = 'none';
-
+icon.style.display = 'none'
 // ファビコンURLを生成する関数
 function faviconURL(u) {
   try {
@@ -115,6 +114,8 @@ function dumpNode(bookmarkNode) {
   const anchor = document.createElement('a');
   anchor.className = 'bookmark-link'; // クラス名を追加
   anchor.textContent = bookmarkNode.title;
+  anchor.style.cursor = 'pointer'; // マウスオーバー時にポインターを表示
+  anchor.style.color = 'white'; 
 
 
     // テキストの文字数制限
@@ -128,6 +129,7 @@ function dumpNode(bookmarkNode) {
 
   // ファビコンを表示するためのimg要素を作成
   const img = document.createElement('img');
+  img.style.cursor = 'pointer'; // マウスオーバー時にポインターを表示
   img.className = 'favicon'; // クラス名を追加
 
   if (bookmarkNode.children) {
@@ -139,8 +141,10 @@ function dumpNode(bookmarkNode) {
   }
   const li = document.createElement('li');
   li.className = 'bookmark-item'; // クラス名を追加
+  li.style.backgroundColor = '#696969'; // 背景色を設定
   li.appendChild(img); // ファビコンを追加
   li.appendChild(anchor);
+
   // ファビコンのクリックイベントを追加
   img.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
@@ -219,23 +223,28 @@ function dumpNode(bookmarkNode) {
   if (true) {
     // 編集ボタンを追加
 
-    const link = document.createElement('a');
-    link.className = 'edit-link'; // クラス名を追加
-    link.href = '#'; // リンク先を設定
-    link.style.zIndex = '9999'; // リンク先を設定
+    // span 要素を作成してクラス名とテキストを設定
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'material-symbols-outlined';
+    iconSpan.textContent = 'more_vert';
+    // アイコンの色を白に設定するためのスタイルを追加
+    iconSpan.style.color = 'white';
 
+    // a 要素を作成してクラス名、href、スタイルを設定
+    const link = document.createElement('a');
+    link.className = 'edit-link';
+    link.href = '#';
+    link.style.zIndex = '9999';
+
+    // click イベントを追加
     link.addEventListener('click', (event) => {
         event.preventDefault(); // デフォルトのリンク動作をキャンセル
         showActionsDialog(bookmarkNode.id);
     });
-    
-    // 画像を表示する img 要素を作成
-    const image = document.createElement('img');
-    image.src = './images/edit.png'; // 画像のパスを設定
-    image.alt = 'Image Alt Text'; // 画像の代替テキストを設定
-    
-    // img 要素を a 要素に追加
-    link.appendChild(image);
+
+    // span 要素を a 要素に追加
+    link.appendChild(iconSpan);
+
     
 
 
@@ -398,10 +407,11 @@ function sortBookmarksToFolder() {
 function createRemoveButton(bookmarkId) {
   const button = document.createElement('button');
   button.textContent = '削除';
-  button.style.width = '50px';
-  button.style.backgroundColor = '#1E1F22';
-  button.style.color = 'whitesmoke';
-  button.style.borderRadius = '5xp';
+  button.style.width = '80px';
+  button.style.margin = '10px';
+  button.style.backgroundColor = '#1e90ff';
+  button.style.color = 'white';
+  button.style.borderRadius = '5px';
   button.addEventListener('click', () => {
     removeBookmark(bookmarkId);
   });
@@ -435,10 +445,11 @@ function removeBookmark(bookmarkId) {
 function createMoveButton(bookmarkId,dialog) {
   const button = document.createElement('button');
   button.textContent = '移動';
-  button.style.width = '50px';
-  button.style.backgroundColor = '#1E1F22';
-  button.style.color = 'whitesmoke';
-  button.style.borderRadius = '5xp';
+  button.style.width = '80px';
+  button.style.margin = '10px';
+  button.style.backgroundColor = '#1e90ff';
+  button.style.color = 'white';
+  button.style.borderRadius = '5px';
   button.addEventListener('click', async () => {
     dialog.remove(); // ダイアログを閉じる
     
@@ -466,9 +477,12 @@ async function selectFolder(bookmarkId) {
       dialog.style.top = '50%';
       dialog.style.left = '50%';
       dialog.style.transform = 'translate(-50%, -50%)';
-      dialog.style.padding = '20px';
+      dialog.style.padding = '50px';
       dialog.style.border = '1px solid #ccc';
       dialog.style.zIndex = '9999';
+      dialog.style.backgroundColor = '#2B2D30';
+      dialog.style.color = 'white';
+
    
       // フォルダ名のリストを表示
       const list = document.createElement('ul');
@@ -476,6 +490,11 @@ async function selectFolder(bookmarkId) {
         const listItem = document.createElement('li');
         listItem.textContent = folder.title;
         listItem.style.cursor = 'pointer';
+        listItem.style.backgroundColor = '#1e90ff';
+        listItem.style.color = 'white';
+        listItem.style.border = '1px solid #ccc';
+        listItem.style.borderRadius = '5px';
+        listItem.style.padding = '10px';
         listItem.addEventListener('click', () => {
           dialog.remove(); // ダイアログを閉じる
           resolve(folder.id); // 選択されたフォルダのIDを解決して返す
@@ -594,10 +613,13 @@ function showActionsDialog(bookmarkId) {
   dialog.style.top = '50%';
   dialog.style.left = '50%';
   dialog.style.transform = 'translate(-50%, -50%)';
-  dialog.style.backgroundColor = '#fff';
-  dialog.style.padding = '20px';
+  dialog.style.backgroundColor = '#2B2D30';
+  dialog.style.padding = '50px';
+  dialog.style.width = '50%';
   dialog.style.border = '1px solid #ccc';
   dialog.style.zIndex = '9999';
+  dialog.style.textAlign = 'center';
+  
 
   const deleteButton = createRemoveButton(bookmarkId);
   const moveButton = createMoveButton(bookmarkId,dialog);
@@ -612,16 +634,16 @@ function showActionsDialog(bookmarkId) {
 }
 
 function createBackButton(dialog,flag,bookmarkId,overlay) {
-  const backButton = document.createElement('button');
-  backButton.textContent = '';
+  const backButton = document.createElement('span');
+
   backButton.style.position = 'absolute';
   backButton.style.top = '2px'; // 上端からの距離
   backButton.style.left = '2px'; // 左端からの距離
-  if(flag){
-    backButton.style.backgroundImage = 'url(./images/close.png)';
-  }
-  else{
-    backButton.style.backgroundImage = 'url(./images/back.png)';
+  backButton.className = 'material-symbols-outlined';
+  if (flag) {
+      backButton.innerHTML = '<span style="color: white;">close</span>';
+  } else {
+      backButton.innerHTML = '<span style="color: white;">arrow_back</span>';
   }
   backButton.style.backgroundSize = 'cover';
   backButton.style.width = '20px'; // ボタンの幅
