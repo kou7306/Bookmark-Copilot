@@ -141,7 +141,7 @@ function dumpNode(bookmarkNode) {
   // ファビコンのクリックイベントを追加
   img.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
-    if (bookmarkNode.children && bookmarkNode.children.length > 0) {
+    if (bookmarkNode.children) {
       // 子ノードがある場合はそれを表示
       const childList = this.nextSibling.nextSibling;
       childList.style.display = childList.style.display === 'none' ? '' : 'none';
