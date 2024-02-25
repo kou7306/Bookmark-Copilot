@@ -421,7 +421,6 @@ async function selectFolder(bookmarkId) {
       dialog.style.top = '50%';
       dialog.style.left = '50%';
       dialog.style.transform = 'translate(-50%, -50%)';
-      dialog.style.backgroundColor = '#fff';
       dialog.style.padding = '20px';
       dialog.style.border = '1px solid #ccc';
       dialog.style.zIndex = '9999';
