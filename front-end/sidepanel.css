@@ -29,12 +29,7 @@ li {
   
 /* リンクのスタイル */
 a {
-  display: block; /* ブロック要素として表示 */
-  padding: 5px 10px; /* パディングを追加 */
-  background-color: #1E1F22; /* 背景色 */
-  color: whitesmoke; /* 文字色 */
-  text-decoration: none; /* 下線を非表示 */
-  border-radius: 5px; /* 角を丸める */
+  background: transparent; /* 背景を透明にする */
 }
 
 

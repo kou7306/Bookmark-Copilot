@@ -142,7 +142,44 @@ function dumpNode(bookmarkNode) {
   li.appendChild(img); // ファビコンを追加
   li.appendChild(anchor);
   // ファビコンのクリックイベントを追加
-  li.addEventListener('click', function (event) {
+  img.addEventListener('click', function (event) {
+    event.preventDefault();  // デフォルトのリンクの挙動を防止
+    if (bookmarkNode.children) {
+      // 子ノードがある場合はそれを表示
+      const childList = this.querySelector('ul');
+      if (!childList) {
+        icon.style.display = 'block';
+        const sidebar = document.getElementById('bookmarks');
+        sidebar.innerHTML = ''; // サイドバーをクリア
+        const serchResult = document.getElementById('bookmarksList');
+        serchResult.innerHTML = ''; // 検索結果をクリア
+        sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+      }
+      else{
+        childList.style.display = childList.style.display === 'none' ? '' : 'none';
+              // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+        if (childList.style.display !== 'none') {
+          icon.style.display = 'block';
+          const sidebar = document.getElementById('bookmarks');
+          sidebar.innerHTML = ''; // サイドバーをクリア
+          const serchResult = document.getElementById('bookmarksList');
+          serchResult.innerHTML = ''; // 検索結果をクリア
+          sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+        }
+      }
+
+     
+
+
+
+    } else if (bookmarkNode.url) {
+      // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
+      chrome.tabs.create({ url: bookmarkNode.url });
+    }
+  });
+
+  // テキストのクリックイベントを追加
+  anchor.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
     if (bookmarkNode.children) {
       // 子ノードがある場合はそれを表示
@@ -185,6 +222,8 @@ function dumpNode(bookmarkNode) {
     const link = document.createElement('a');
     link.className = 'edit-link'; // クラス名を追加
     link.href = '#'; // リンク先を設定
+    link.style.zIndex = '9999'; // リンク先を設定
+
     link.addEventListener('click', (event) => {
         event.preventDefault(); // デフォルトのリンク動作をキャンセル
         showActionsDialog(bookmarkNode.id);
