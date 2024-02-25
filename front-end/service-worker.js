@@ -170,3 +170,4 @@ chrome.bookmarks.onMoved.addListener((id, moveInfo) => {
 chrome.bookmarks.onRemoved.addListener(() => {
   chrome.runtime.sendMessage({ action: 'updateBookmarks' });
 });
+

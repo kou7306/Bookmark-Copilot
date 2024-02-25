@@ -61,12 +61,13 @@ a {
 
 /* フォルダ作成 */
 #createFolder{
-  position: absolute;
-  top: 10px;
-  right: 70px;
-  background-color: #8C5024;
-  color: #FDDDC9;
-  height: 30px;
+  background-color: transparent;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 50px;
+  color: #1e90ff;
+  z-index: 9999;
 }
 
 
@@ -89,4 +90,7 @@ a {
   top: 2px;
   background-color: transparent;
 }
+
+
+
 
