@@ -1,8 +1,8 @@
 {
-  "name": "bookmarks side panel",
+  "name": "Bookmark Copilot",
   "version": "0.1",
   "manifest_version": 3,
-  "description": "Provides definitions in the side panel.",
+  "description": "AI helps you organize your bookmarks.",
   "background": {
     "service_worker": "service-worker.js"
   },
