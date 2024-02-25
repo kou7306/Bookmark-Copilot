@@ -360,6 +360,9 @@ function createRemoveButton(bookmarkId) {
   const button = document.createElement('button');
   button.textContent = '削除';
   button.style.width = '50px';
+  button.style.backgroundColor = '#1E1F22';
+  button.style.color = 'whitesmoke';
+  button.style.borderRadius = '5xp';
   button.addEventListener('click', () => {
     removeBookmark(bookmarkId);
   });
@@ -394,6 +397,9 @@ function createMoveButton(bookmarkId,dialog) {
   const button = document.createElement('button');
   button.textContent = '移動';
   button.style.width = '50px';
+  button.style.backgroundColor = '#1E1F22';
+  button.style.color = 'whitesmoke';
+  button.style.borderRadius = '5xp';
   button.addEventListener('click', async () => {
     dialog.remove(); // ダイアログを閉じる
     
