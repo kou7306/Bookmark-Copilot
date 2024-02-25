@@ -137,19 +137,17 @@ function dumpNode(bookmarkNode) {
     // ブックマークの場合はファビコンを表示
     img.src = faviconURL(bookmarkNode.url);
   }
-
+  const li = document.createElement('li');
+  li.className = 'bookmark-item'; // クラス名を追加
+  li.appendChild(img); // ファビコンを追加
+  li.appendChild(anchor);
   // ファビコンのクリックイベントを追加
-  img.addEventListener('click', function (event) {
+  li.addEventListener('click', function (event) {
     event.preventDefault();  // デフォルトのリンクの挙動を防止
     if (bookmarkNode.children) {
       // 子ノードがある場合はそれを表示
-      const childList = this.nextSibling.nextSibling;
-      childList.style.display = childList.style.display === 'none' ? '' : 'none';
-      // フォルダの開閉状態に応じてアイコンを切り替え
-      this.src = childList.style.display === 'none' ? 'icons/folder_96.png' : 'icons/folder_opened_96.png';
-
-      // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
-      if (childList.style.display !== 'none') {
+      const childList = this.querySelector('ul');
+      if (!childList) {
         icon.style.display = 'block';
         const sidebar = document.getElementById('bookmarks');
         sidebar.innerHTML = ''; // サイドバーをクリア
@@ -157,16 +155,30 @@ function dumpNode(bookmarkNode) {
         serchResult.innerHTML = ''; // 検索結果をクリア
         sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
       }
+      else{
+        childList.style.display = childList.style.display === 'none' ? '' : 'none';
+              // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+        if (childList.style.display !== 'none') {
+          icon.style.display = 'block';
+          const sidebar = document.getElementById('bookmarks');
+          sidebar.innerHTML = ''; // サイドバーをクリア
+          const serchResult = document.getElementById('bookmarksList');
+          serchResult.innerHTML = ''; // 検索結果をクリア
+          sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+        }
+      }
+
+     
+
+
+
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
     }
   });
 
-  const li = document.createElement('li');
-  li.className = 'bookmark-item'; // クラス名を追加
-  li.appendChild(img); // ファビコンを追加
-  li.appendChild(anchor);
+
   if (true) {
     // 編集ボタンを追加
 
