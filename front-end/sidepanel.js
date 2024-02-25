@@ -155,19 +155,23 @@ function dumpNode(bookmarkNode) {
         serchResult.innerHTML = ''; // 検索結果をクリア
         sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
       }
-
-      childList.style.display = childList.style.display === 'none' ? '' : 'none';
-
-
-      // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
-      if (childList.style.display !== 'none') {
-        icon.style.display = 'block';
-        const sidebar = document.getElementById('bookmarks');
-        sidebar.innerHTML = ''; // サイドバーをクリア
-        const serchResult = document.getElementById('bookmarksList');
-        serchResult.innerHTML = ''; // 検索結果をクリア
-        sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+      else{
+        childList.style.display = childList.style.display === 'none' ? '' : 'none';
+              // フォルダが開かれたとき、サイドバーをクリアしてからその中身を表示
+        if (childList.style.display !== 'none') {
+          icon.style.display = 'block';
+          const sidebar = document.getElementById('bookmarks');
+          sidebar.innerHTML = ''; // サイドバーをクリア
+          const serchResult = document.getElementById('bookmarksList');
+          serchResult.innerHTML = ''; // 検索結果をクリア
+          sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
+        }
       }
+
+     
+
+
+
     } else if (bookmarkNode.url) {
       // 子ノードがなく、URLがある場合は新しいタブでリンクを開く
       chrome.tabs.create({ url: bookmarkNode.url });
