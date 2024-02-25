@@ -153,6 +153,8 @@ function dumpNode(bookmarkNode) {
         icon.style.display = 'block';
         const sidebar = document.getElementById('bookmarks');
         sidebar.innerHTML = ''; // サイドバーをクリア
+        const serchResult = document.getElementById('bookmarksList');
+        serchResult.innerHTML = ''; // 検索結果をクリア
         sidebar.appendChild(dumpTreeNodes(bookmarkNode.children)); // フォルダの中身を表示
       }
     } else if (bookmarkNode.url) {
@@ -224,6 +226,7 @@ var searchInput = document.getElementById('searchInput');
 
 if (searchInput == null) {
   window.location.reload();
+  searchInput.focus(); 
 }
 
 // searchInput が存在する場合のみ、イベントリスナーを追加
@@ -237,13 +240,17 @@ if (searchInput !== null) {
 function displaySearchResults(results, searchTerm) {
   var bookmarksList = document.getElementById('bookmarksList');
   bookmarksList.innerHTML = ''; // 検索前にリストをクリア
+  
 
   // 検索結果の処理
   results.forEach(function(bookmark) {
+    
  
     // ブックマークの名前に検索語が含まれる場合のみリストに追加
+    console.log(bookmark);
 
     bookmarksList.appendChild(dumpNode(bookmark));
+  
 
   });
 
@@ -265,10 +272,29 @@ function searchBookmarks() {
   // 検索語が空でない場合に検索を実行
   if (searchTerm) {
     chrome.bookmarks.search(searchTerm, function(results) {
-      displaySearchResults(results, searchTerm);
+      
+   
+        // 検索結果からフォルダを見つける
+        var folder = results.find(result => result.url === undefined);
+        if (folder) {
+          // フォルダが見つかった場合は、その中身を取得する
+          chrome.bookmarks.getSubTree(folder.id, function(subTree) {
+            var folderWithContents = subTree[0]; // フォルダとその中身を含むフォルダを取得
+            // ここで folderWithContents を使用して必要な処理を行う
+            displaySearchResults([folderWithContents], searchTerm);
+          });
+        }
+        else{
+          console.log(results);
+          displaySearchResults(results, searchTerm);
+        }
+      
+      
+      
     });
   } else {
     window.location.reload();
+
   }
 }
 
