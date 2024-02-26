@@ -1,4 +1,4 @@
-# bookmarkAI
+# bookmark　CopilotはAIがブックマークをフォルダに自動振り分けしてくれるChrome拡張機能です。
 
 ## サーバー起動
 ```bash
